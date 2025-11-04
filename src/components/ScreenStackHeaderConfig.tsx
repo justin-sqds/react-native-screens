@@ -112,6 +112,9 @@ export const ScreenStackHeaderConfig = React.forwardRef<
   return (
     <ScreenStackHeaderConfigNativeComponent
       {...props}
+      largeSubtitlePresent={
+        props.largeSubtitle !== undefined && props.largeSubtitle !== null
+      }
       headerLeftBarButtonItems={preparedHeaderLeftBarButtonItems}
       headerRightBarButtonItems={preparedHeaderRightBarButtonItems}
       onPressHeaderBarButtonItem={onPressHeaderBarButtonItem}
