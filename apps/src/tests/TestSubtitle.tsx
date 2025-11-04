@@ -160,11 +160,10 @@ const App = (): JSX.Element => {
         name="root"
         component={MainScreen}
         options={{
-          headerLargeTitle: true,
+          headerLargeTitle: false,
           headerTransparent: true,
           title: 'Future of Mobile Dev',
-          // @ts-expect-error
-          subtitle: '09/05/2025 • 5 min read',
+          subtitle: 'Got it running',
         }}
       />
     </Stack.Navigator>

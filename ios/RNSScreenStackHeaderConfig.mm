@@ -775,13 +775,20 @@ RNS_IGNORE_SUPER_CALL_END
 
   // This assignment should be done after `navitem.titleView = ...` assignment (iOS 16.0 bug).
   // See: https://github.com/software-mansion/react-native-screens/issues/1570 (comments)
-  navitem.title = config.title;
-  if (@available(iOS 26.0, *)) {
-    navitem.subtitle = config.subtitle;
+    navitem.title = config.title;
+    if (@available(iOS 26.0, *)) {
+      NSLog(@"[DEBUG] Setting subtitle: %@", config.subtitle);
+      NSLog(@"[DEBUG] Setting largeSubtitle: %@", config.largeSubtitle);
+      NSLog(@"[DEBUG] largeSubtitlePresent: %d", config.largeSubtitlePresent);
+      
+      navitem.subtitle = config.subtitle;
+      
+      if (config.largeSubtitlePresent) {
+        navitem.largeSubtitle = config.largeSubtitle;
+      }
 
-    if (config.largeSubtitlePresent) {
-      navitem.largeSubtitle = config.largeSubtitle;
-    }
+  } else {
+      printf("justin not available");
   }
   navitem.leftBarButtonItems = [config barButtonItemsFromConfigs:config.headerLeftBarButtonItems
                                                 withCurrentItems:navitem.leftBarButtonItems];

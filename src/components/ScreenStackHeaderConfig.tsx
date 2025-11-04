@@ -109,6 +109,16 @@ export const ScreenStackHeaderConfig = React.forwardRef<
       }
     : undefined;
 
+  // Debug logging for subtitle props
+  if (props.subtitle || props.largeSubtitle) {
+    console.log('[ScreenStackHeaderConfig] Subtitle props:', {
+      subtitle: props.subtitle,
+      largeSubtitle: props.largeSubtitle,
+      largeSubtitlePresent:
+        props.largeSubtitle !== undefined && props.largeSubtitle !== null,
+    });
+  }
+
   return (
     <ScreenStackHeaderConfigNativeComponent
       {...props}
