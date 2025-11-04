@@ -1,0 +1,192 @@
+diff --git a/packages/native-stack/src/types.tsx b/packages/native-stack/src/types.tsx
+index d24ded4aa..a2e7a27e5 100644
+--- a/packages/native-stack/src/types.tsx
++++ b/packages/native-stack/src/types.tsx
+@@ -155,6 +155,14 @@ export type NativeStackNavigationOptions = {
+    * String that can be displayed in the header as a fallback for `headerTitle`.
+    */
+   title?: string;
++  /**
++   * String that can be displayed in the header as a fallback for `headerSubtitle`.
++   *
++   * Only supported on iOS 26+.
++   *
++   * @platform ios
++   */
++  subtitle?: string;
+   /**
+    * Function that given `HeaderProps` returns a React Element to display as a header.
+    */
+@@ -364,6 +372,54 @@ export type NativeStackNavigationOptions = {
+       color?: string;
+     }
+   >;
++  /**
++   * String that can be displayed in the header below the title.
++   *
++   * Only supported on iOS 26.0+.
++   *
++   * @platform ios
++   */
++  headerSubtitle?: string;
++  /**
++   * Style object for the subtitle. Supported properties:
++   * - fontFamily
++   * - fontSize
++   * - fontWeight
++   * - color
++   *
++   * Only supported on iOS 26.0+.
++   *
++   * @platform ios
++   */
++  headerSubtitleStyle?: StyleProp<
++    Pick<TextStyle, 'fontFamily' | 'fontSize' | 'fontWeight'> & {
++      color?: string;
++    }
++  >;
++  /**
++   * String that can be displayed in the large header below the large title.
++   *
++   * Only supported on iOS 26.0+.
++   *
++   * @platform ios
++   */
++  headerLargeSubtitle?: string;
++  /**
++   * Style object for the large subtitle. Supported properties:
++   * - fontFamily
++   * - fontSize
++   * - fontWeight
++   * - color
++   *
++   * Only supported on iOS 26.0+.
++   *
++   * @platform ios
++   */
++  headerLargeSubtitleStyle?: StyleProp<
++    Pick<TextStyle, 'fontFamily' | 'fontSize' | 'fontWeight'> & {
++      color?: string;
++    }
++  >;
+   /**
+    * Options to render a native search bar.
+    * You also need to specify `contentInsetAdjustmentBehavior="automatic"` in your `ScrollView`, `FlatList` etc.
+diff --git a/packages/native-stack/src/views/useHeaderConfigProps.tsx b/packages/native-stack/src/views/useHeaderConfigProps.tsx
+index 1ced6e456..28cd131fb 100644
+--- a/packages/native-stack/src/views/useHeaderConfigProps.tsx
++++ b/packages/native-stack/src/views/useHeaderConfigProps.tsx
+@@ -176,12 +176,17 @@ export function useHeaderConfigProps({
+   headerTitle,
+   headerTitleAlign,
+   headerTitleStyle,
++  headerSubtitle,
++  headerSubtitleStyle,
++  headerLargeSubtitle,
++  headerLargeSubtitleStyle,
+   headerTransparent,
+   headerSearchBarOptions,
+   headerTopInsetEnabled,
+   headerBack,
+   route,
+   title,
++  subtitle,
+   unstable_headerLeftItems: headerLeftItems,
+   unstable_headerRightItems: headerRightItems,
+ }: Props): ScreenStackHeaderConfigProps {
+@@ -202,15 +207,26 @@ export function useHeaderConfigProps({
+       Platform.select({ ios: fonts.bold, default: fonts.medium }),
+       headerTitleStyle,
+     ]) || {};
++  const headerSubtitleStyleFlattened =
++    StyleSheet.flatten([fonts.regular, headerSubtitleStyle]) || {};
++  const headerLargeSubtitleStyleFlattened =
++    StyleSheet.flatten([fonts.regular, headerLargeSubtitleStyle]) || {};
+   const headerStyleFlattened = StyleSheet.flatten(headerStyle) || {};
+   const headerLargeStyleFlattened = StyleSheet.flatten(headerLargeStyle) || {};
+ 
+-  const [backTitleFontFamily, largeTitleFontFamily, titleFontFamily] =
+-    processFonts([
+-      headerBackTitleStyleFlattened.fontFamily,
+-      headerLargeTitleStyleFlattened.fontFamily,
+-      headerTitleStyleFlattened.fontFamily,
+-    ]);
++  const [
++    backTitleFontFamily,
++    largeTitleFontFamily,
++    titleFontFamily,
++    subtitleFontFamily,
++    largeSubtitleFontFamily,
++  ] = processFonts([
++    headerBackTitleStyleFlattened.fontFamily,
++    headerLargeTitleStyleFlattened.fontFamily,
++    headerTitleStyleFlattened.fontFamily,
++    headerSubtitleStyleFlattened.fontFamily,
++    headerLargeSubtitleStyleFlattened.fontFamily,
++  ]);
+ 
+   const backTitleFontSize =
+     'fontSize' in headerBackTitleStyleFlattened
+@@ -218,6 +234,7 @@ export function useHeaderConfigProps({
+       : undefined;
+ 
+   const titleText = getHeaderTitle({ title, headerTitle }, route.name);
++  const subtitleText = headerSubtitle ?? subtitle;
+   const titleColor =
+     'color' in headerTitleStyleFlattened
+       ? headerTitleStyleFlattened.color
+@@ -228,6 +245,16 @@ export function useHeaderConfigProps({
+       : undefined;
+   const titleFontWeight = headerTitleStyleFlattened.fontWeight;
+ 
++  const subtitleColor =
++    'color' in headerSubtitleStyleFlattened
++      ? headerSubtitleStyleFlattened.color
++      : undefined;
++  const subtitleFontSize =
++    'fontSize' in headerSubtitleStyleFlattened
++      ? headerSubtitleStyleFlattened.fontSize
++      : undefined;
++  const subtitleFontWeight = headerSubtitleStyleFlattened.fontWeight;
++
+   const largeTitleBackgroundColor = headerLargeStyleFlattened.backgroundColor;
+   const largeTitleColor =
+     'color' in headerLargeTitleStyleFlattened
+@@ -239,6 +266,16 @@ export function useHeaderConfigProps({
+       : undefined;
+   const largeTitleFontWeight = headerLargeTitleStyleFlattened.fontWeight;
+ 
++  const largeSubtitleColor =
++    'color' in headerLargeSubtitleStyleFlattened
++      ? headerLargeSubtitleStyleFlattened.color
++      : undefined;
++  const largeSubtitleFontSize =
++    'fontSize' in headerLargeSubtitleStyleFlattened
++      ? headerLargeSubtitleStyleFlattened.fontSize
++      : undefined;
++  const largeSubtitleFontWeight = headerLargeSubtitleStyleFlattened.fontWeight;
++
+   const headerTitleStyleSupported: TextStyle = { color: titleColor };
+ 
+   if (headerTitleStyleFlattened.fontFamily != null) {
+@@ -477,6 +514,20 @@ export function useHeaderConfigProps({
+     titleFontFamily,
+     titleFontSize,
+     titleFontWeight: String(titleFontWeight),
++    subtitle: subtitleText,
++    subtitleColor,
++    subtitleFontFamily,
++    subtitleFontSize,
++    subtitleFontWeight: subtitleFontWeight
++      ? String(subtitleFontWeight)
++      : undefined,
++    largeSubtitle: headerLargeSubtitle,
++    largeSubtitleColor,
++    largeSubtitleFontFamily,
++    largeSubtitleFontSize,
++    largeSubtitleFontWeight: largeSubtitleFontWeight
++      ? String(largeSubtitleFontWeight)
++      : undefined,
+     topInsetEnabled: headerTopInsetEnabled,
+     translucent: translucent === true,
+     children,
