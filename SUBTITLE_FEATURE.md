@@ -21,15 +21,43 @@ yarn add github:justin-sqds/react-native-screens#main
 
 ### 2. Apply React Navigation patch
 
-This feature requires changes to `@react-navigation/native-stack`. You have two options:
+This feature requires changes to `@react-navigation/native-stack`. Choose the option that matches your setup:
 
-#### Option A: Using patch-package (Recommended)
+#### Option A: Yarn Built-in Patches (Recommended for Yarn 2+)
+
+If you're using Yarn 2+ with `.yarn/patches`:
+
+1. Start the interactive patch process:
+```bash
+yarn patch @react-navigation/native-stack
+```
+
+2. Yarn will create a temporary folder and show you the path. Navigate there and apply the patch:
+```bash
+# Use the path shown by Yarn (example: /private/var/folders/.../user/T/xfs-a1b2c3d4/user)
+cd /path/shown/by/yarn
+
+# Download and apply the patch
+curl https://raw.githubusercontent.com/justin-sqds/react-native-screens/main/react-navigation-subtitle.patch | patch -p1
+```
+
+3. Commit the patch (Yarn will tell you the exact command):
+```bash
+yarn patch-commit -s /path/shown/by/yarn
+```
+
+This will:
+- Create a patch file in `.yarn/patches/@react-navigation-native-stack-npm-X.X.X-xxxxxxxx.patch`
+- Update your `package.json` with the patch in `resolutions`
+- Automatically apply the patch on every `yarn install`
+
+#### Option B: patch-package (npm or Yarn 1.x)
 
 1. Install patch-package:
 ```bash
 npm install --save-dev patch-package
 # or
-yarn add -D patch-package
+yarn add -D patch-package postinstall-postinstall
 ```
 
 2. Add postinstall script to your `package.json`:
@@ -41,20 +69,22 @@ yarn add -D patch-package
 }
 ```
 
-3. Create the patch directory and apply the patch:
+3. Create the patch directory and download the patch:
 ```bash
 mkdir -p patches
 curl -o patches/@react-navigation+native-stack+7.6.7.patch https://raw.githubusercontent.com/justin-sqds/react-native-screens/main/react-navigation-subtitle.patch
 ```
 
-4. Run install again:
+4. Run install to apply the patch:
 ```bash
 npm install
 # or
 yarn install
 ```
 
-#### Option B: Manual patch
+5. Commit the `patches/` directory to your repo.
+
+#### Option C: Manual patch (not recommended)
 
 1. Download the patch file:
 ```bash
