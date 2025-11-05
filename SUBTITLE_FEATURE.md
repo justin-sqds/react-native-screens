@@ -21,11 +21,7 @@ yarn add github:justin-sqds/react-native-screens#main
 
 ### 2. Apply React Navigation patch
 
-This feature requires changes to `@react-navigation/native-stack`. Choose the option that matches your setup:
-
-#### Option A: Yarn Built-in Patches (Recommended for Yarn 2+)
-
-If you're using Yarn 2+ with `.yarn/patches`:
+This feature requires changes to `@react-navigation/native-stack`. Use Yarn's built-in patch feature:
 
 1. Start the interactive patch process:
 ```bash
@@ -50,54 +46,6 @@ This will:
 - Create a patch file in `.yarn/patches/@react-navigation-native-stack-npm-X.X.X-xxxxxxxx.patch`
 - Update your `package.json` with the patch in `resolutions`
 - Automatically apply the patch on every `yarn install`
-
-#### Option B: patch-package (npm or Yarn 1.x)
-
-1. Install patch-package:
-```bash
-npm install --save-dev patch-package
-# or
-yarn add -D patch-package postinstall-postinstall
-```
-
-2. Add postinstall script to your `package.json`:
-```json
-{
-  "scripts": {
-    "postinstall": "patch-package"
-  }
-}
-```
-
-3. Create the patch directory and download the patch:
-```bash
-mkdir -p patches
-curl -o patches/@react-navigation+native-stack+7.6.7.patch https://raw.githubusercontent.com/justin-sqds/react-native-screens/main/react-navigation-subtitle.patch
-```
-
-4. Run install to apply the patch:
-```bash
-npm install
-# or
-yarn install
-```
-
-5. Commit the `patches/` directory to your repo.
-
-#### Option C: Manual patch (not recommended)
-
-1. Download the patch file:
-```bash
-curl -o react-navigation-subtitle.patch https://raw.githubusercontent.com/justin-sqds/react-native-screens/main/react-navigation-subtitle.patch
-```
-
-2. Apply it to your node_modules:
-```bash
-cd node_modules/@react-navigation/native-stack
-git apply ../../../react-navigation-subtitle.patch
-```
-
-Note: You'll need to reapply this patch after every `npm install` / `yarn install`.
 
 ## Usage
 
